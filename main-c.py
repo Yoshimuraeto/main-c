@@ -38,8 +38,6 @@ class MainC:
                 HumanMessagePromptTemplate.from_template("{input}"),
             ]
         )
-        self.addresed_accounts = ["a", "b", "c"]
-        self.addresed_groups = ["???"]
 
     def prepare_firestore(self):
         try:
@@ -105,7 +103,6 @@ class MainC:
         # チャットのメッセージの履歴作成と表示
         if "message_history" not in st.session_state:
             st.session_state.message_history = []
-            st.session_state.initge = ["はじめまして!!"]
 
         else:
             with st.session_state.chat_placeholder.container():
@@ -166,6 +163,7 @@ class MainC:
             st.session_state.db = self.prepare_firestore()
             self.prepare_memory(self.chat_model, self.PROMPT)
             self.get_ids()
+            st.session_state.initge = ["はじめまして!!"]
 
         if st.session_state.db is None:
             st.write("Firebaseの認証に失敗しました")
