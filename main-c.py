@@ -221,11 +221,6 @@ class MainC:
                     disabled=st.session_state.chat_input_disabled,
                     on_submit=self.disable_chat_input(),
                 ):
-                    # チャット履歴にユーザーメッセージを追加
-                    st.session_state.message_history.append(
-                        {"role": "user", "content": user_input}
-                    )
-
                     with st.spinner("Wait for it..."):
                         # AIからの応答を取得、データベースに登録
                         assistant_response = self.generate_and_store_response(
@@ -235,6 +230,11 @@ class MainC:
                     # AIからの応答を表示
                     with st.chat_message("assistant"):
                         st.markdown(assistant_response)
+
+                    # チャット履歴にユーザーメッセージを追加
+                    st.session_state.message_history.append(
+                        {"role": "user", "content": user_input}
+                    )
 
                     # チャット履歴にAIからの応答を追加
                     st.session_state.message_history.append(
