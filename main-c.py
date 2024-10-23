@@ -143,7 +143,7 @@ class MainC:
                     key="init_greeting_plus",
                     avatar_style="micah",
                 )
-                for i in range(len(st.session_state.message_history)):
+                for i in range(len(st.session_state.message_history) - 1):
                     message(
                         st.session_state.message_history[i]["content"],
                         is_user=True,
