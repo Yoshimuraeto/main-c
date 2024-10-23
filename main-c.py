@@ -129,14 +129,14 @@ class MainC:
                 history_messages_key="history",
             )
 
-    def display_chat_history(self):
+    def display_chat_history(self, chat_placeholder):
         # チャットのメッセージの履歴作成と表示
         if "message_history" not in st.session_state:
             st.session_state.message_history = []
             st.session_state.initge = ["はじめまして!!"]
 
         else:
-            with st.session_state.chat_placeholder.container():
+            with chat_placeholder.container():
                 message(
                     st.session_state.initge[0],
                     key="init_greeting_plus",
@@ -198,8 +198,8 @@ class MainC:
         if st.session_state.db is None:
             st.write("Firebaseの認証に失敗しました")
 
-        st.session_state.chat_placeholder = st.empty()
-        self.display_chat_history()
+        chat_placeholder = st.empty()
+        self.display_chat_history(chat_placeholder)
 
         # チャットの開始
         if "user_id" in st.session_state and "group_id" in st.session_state:
