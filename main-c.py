@@ -144,7 +144,7 @@ class MainC:
                 )
                 for i in range(len(st.session_state.message_history) - 1):
                     message(
-                        st.session_state.message_history[i]["content"],
+                        st.session_state.message_history[i]["user_content"],
                         is_user=True,
                         key=str(i),
                         avatar_style="adventurer",
@@ -152,7 +152,7 @@ class MainC:
                     )
                     key_generated = str(i) + "keyg"
                     message(
-                        st.session_state.message_history[i + 1]["content"],
+                        st.session_state.message_history[i]["assistant_content"],
                         key=str(key_generated),
                         avatar_style="micah",
                     )
@@ -227,14 +227,12 @@ class MainC:
                             user_input, st.session_state.db
                         )
 
-                    # チャット履歴にユーザーメッセージを追加
+                    # チャット履歴にメッセージを追加
                     st.session_state.message_history.append(
-                        {"role": "user", "content": user_input}
-                    )
-
-                    # チャット履歴にAIからの応答を追加
-                    st.session_state.message_history.append(
-                        {"role": "assistant", "content": assistant_response}
+                        {
+                            "user_content": user_input,
+                            "assistant_content": assistant_response,
+                        }
                     )
 
                     st.session_state.count += 1
