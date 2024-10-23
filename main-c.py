@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_chat import message
 
 import firebase_admin
 from firebase_admin import credentials
@@ -134,9 +135,22 @@ class MainC:
             st.session_state.message_history = []
 
         else:
-            for message_history in st.session_state.message_history:
-                with st.chat_message(message_history["role"]):
-                    st.markdown(message_history["content"])
+            chat_placeholder = st.empty()
+            with chat_placeholder.container():
+                for i in range(len(st.session_state.message_history)):
+                    message(
+                        st.session_state.message_history[i],
+                        is_user=True,
+                        key=str(i),
+                        avatar_style="adventurer",
+                        seed="Nala",
+                    )
+                    key_generated = str(i) + "keyg"
+                    message(
+                        st.session_state.message_history[i],
+                        key=str(key_generated),
+                        avatar_style="micah",
+                    )
 
     def generate_and_store_response(self, user_input, db):
         # AIからの応答を取得
