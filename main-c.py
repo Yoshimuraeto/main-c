@@ -103,28 +103,26 @@ class MainC:
         # チャットのメッセージの履歴作成と表示
         if "message_history" not in st.session_state:
             st.session_state.message_history = []
-
-        else:
-            with st.session_state.chat_placeholder.container():
+        with st.session_state.chat_placeholder.container():
+            message(
+                st.session_state.initge[0],
+                key="init_greeting_plus",
+                avatar_style="micah",
+            )
+            for i in range(len(st.session_state.message_history)):
                 message(
-                    st.session_state.initge[0],
-                    key="init_greeting_plus",
+                    st.session_state.message_history[i]["user_content"],
+                    is_user=True,
+                    key=str(i),
+                    avatar_style="adventurer",
+                    seed="Nala",
+                )
+                key_generated = str(i) + "keyg"
+                message(
+                    st.session_state.message_history[i]["assistant_content"],
+                    key=str(key_generated),
                     avatar_style="micah",
                 )
-                for i in range(len(st.session_state.message_history)):
-                    message(
-                        st.session_state.message_history[i]["user_content"],
-                        is_user=True,
-                        key=str(i),
-                        avatar_style="adventurer",
-                        seed="Nala",
-                    )
-                    key_generated = str(i) + "keyg"
-                    message(
-                        st.session_state.message_history[i]["assistant_content"],
-                        key=str(key_generated),
-                        avatar_style="micah",
-                    )
 
     def generate_and_store_response(self, user_input, db):
         # AIからの応答を取得
