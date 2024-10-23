@@ -227,10 +227,6 @@ class MainC:
                             user_input, st.session_state.db
                         )
 
-                    # AIからの応答を表示
-                    with st.chat_message("assistant"):
-                        st.markdown(assistant_response)
-
                     # チャット履歴にユーザーメッセージを追加
                     st.session_state.message_history.append(
                         {"role": "user", "content": user_input}
