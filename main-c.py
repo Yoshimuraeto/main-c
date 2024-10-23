@@ -136,14 +136,13 @@ class MainC:
             st.session_state.initge = ["はじめまして!!"]
 
         else:
-            st.session_state.chat_placeholder = st.empty()
             with st.session_state.chat_placeholder.container():
                 message(
                     st.session_state.initge[0],
                     key="init_greeting_plus",
                     avatar_style="micah",
                 )
-                for i in len(st.session_state.message_history):
+                for i in range(len(st.session_state.message_history) - 1):
                     message(
                         st.session_state.message_history[i]["content"],
                         is_user=True,
@@ -199,6 +198,7 @@ class MainC:
         if st.session_state.db is None:
             st.write("Firebaseの認証に失敗しました")
 
+        st.session_state.chat_placeholder = st.empty()
         self.display_chat_history()
 
         # チャットの開始
