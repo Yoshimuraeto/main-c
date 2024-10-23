@@ -41,34 +41,6 @@ class MainC:
         self.addresed_accounts = ["a", "b", "c"]
         self.addresed_groups = ["???"]
 
-    def vertify_user_id(self, addresed_accounts):
-        if "temp_user_id" not in st.session_state:
-            st.session_state.temp_user_id = ""
-
-        if st.session_state.temp_user_id in addresed_accounts:
-            st.session_state.user_id = st.session_state.temp_user_id
-
-        # ユーザーIDがない場合にのみ入力フィールドを表示
-        if "temp_user_id" in st.session_state:
-            if "user_id" not in st.session_state:
-                st.session_state.temp_user = st.text_input(
-                    "Enter your user_id", placeholder="Enter", key="temp_user_id"
-                )
-
-    def vertify_group_id(self, addresed_accounts):
-        if "temp_group_id" not in st.session_state:
-            st.session_state.temp_group_id = ""
-
-        if st.session_state.temp_group_id in addresed_accounts:
-            st.session_state.group_id = st.session_state.temp_group_id
-
-        # ユーザーIDがない場合にのみ入力フィールドを表示
-        if "temp_group_id" in st.session_state:
-            if "group_id" not in st.session_state:
-                st.session_state.temp_user = st.text_input(
-                    "Enter your group_id", placeholder="Enter", key="temp_group_id"
-                )
-
     def prepare_firestore(self):
         try:
             if not firebase_admin._apps:
@@ -178,22 +150,22 @@ class MainC:
     def enable_chat_input(self):
         st.session_state["chat_input_disabled"] = False
 
+    def get_ids(self):
+        query_params = st.experimental_get_query_params()
+        st.session_state.user_id = query_params.get("user_id", [None])[0]
+        st.session_state.group_id = query_params.get("group", [None])[0]
+
     def forward(self):
         st.title("Main C")
 
         if "count" not in st.session_state:
             st.session_state.count = 0
 
-        if "user_id" not in st.session_state:
-            self.vertify_user_id(self.addresed_accounts)
-
-        if "group_id" not in st.session_state:
-            self.vertify_group_id(self.addresed_groups)
-
         if "chat_input_disabled" not in st.session_state:
             st.session_state.chat_input_disabled = False
             st.session_state.db = self.prepare_firestore()
             self.prepare_memory(self.chat_model, self.PROMPT)
+            self.get_ids()
 
         if st.session_state.db is None:
             st.write("Firebaseの認証に失敗しました")
@@ -201,44 +173,41 @@ class MainC:
         st.session_state.chat_placeholder = st.empty()
         self.display_chat_history()
 
-        # チャットの開始
-        if "user_id" in st.session_state and "group_id" in st.session_state:
+        if st.session_state.count >= 5:
+            group_url = (
+                "https://nagoyapsychology.qualtrics.com/jfe/form/SV_5cZeI9RbaCdozTU"
+            )
+            group_url_with_id = f"{group_url}?user_id={st.session_state.user_id}&group={st.session_state.group_id}"
+            st.markdown(
+                f'これで今回の会話は終了です。こちらをクリックしてアンケートに回答してください。: <a href="{group_url_with_id}" target="_blank">リンク</a>',
+                unsafe_allow_html=True,
+            )
+            self.disable_chat_input()
 
-            if st.session_state.count >= 5:
-                group_url = (
-                    "https://nagoyapsychology.qualtrics.com/jfe/form/SV_5cZeI9RbaCdozTU"
-                )
-                group_url_with_id = f"{group_url}?user_id={st.session_state.user_id}&group={st.session_state.group_id}"
-                st.markdown(
-                    f'これで今回の会話は終了です。こちらをクリックしてアンケートに回答してください。: <a href="{group_url_with_id}" target="_blank">リンク</a>',
-                    unsafe_allow_html=True,
-                )
-                self.disable_chat_input()
-
-            else:
-                if user_input := st.chat_input(
-                    "メッセージを送る",
-                    disabled=st.session_state.chat_input_disabled,
-                    on_submit=self.disable_chat_input(),
-                ):
-                    with st.spinner("Wait for it..."):
-                        # AIからの応答を取得、データベースに登録
-                        assistant_response = self.generate_and_store_response(
-                            user_input, st.session_state.db
-                        )
-
-                    # チャット履歴にメッセージを追加
-                    st.session_state.message_history.append(
-                        {
-                            "user_content": user_input,
-                            "assistant_content": assistant_response,
-                        }
+        else:
+            if user_input := st.chat_input(
+                "メッセージを送る",
+                disabled=st.session_state.chat_input_disabled,
+                on_submit=self.disable_chat_input(),
+            ):
+                with st.spinner("Wait for it..."):
+                    # AIからの応答を取得、データベースに登録
+                    assistant_response = self.generate_and_store_response(
+                        user_input, st.session_state.db
                     )
 
-                    st.session_state.count += 1
+                # チャット履歴にメッセージを追加
+                st.session_state.message_history.append(
+                    {
+                        "user_content": user_input,
+                        "assistant_content": assistant_response,
+                    }
+                )
 
-                    self.enable_chat_input()
-                    st.rerun()
+                st.session_state.count += 1
+
+                self.enable_chat_input()
+                st.rerun()
 
 
 if __name__ == "__main__":
