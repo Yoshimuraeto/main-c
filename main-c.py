@@ -22,9 +22,6 @@ from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
 
 
-# TODO: 英語を日本語に直す
-
-
 class MainC:
     def __init__(self):
         self.chat_model = ChatOpenAI(
@@ -83,7 +80,8 @@ class MainC:
             return db
 
         except:
-            st.write("Firebaseの認証に失敗しました")
+            self.disable_chat_input()
+            return None
 
     def get_session_history(self, session_id: str) -> BaseChatMessageHistory:
         # セッションIDごとの会話履歴の取得
@@ -150,14 +148,18 @@ class MainC:
         if "group_id" not in st.session_state:
             self.vertify_group_id(self.addresed_groups)
 
-        db = self.prepare_firestore()
-        self.prepare_memory(self.chat_model, self.PROMPT)
+        if "chat_input_disabled" not in st.session_state:
+            st.session_state.chat_input_disabled = False
+            st.session_state.db = self.prepare_firestore()
+            self.prepare_memory(self.chat_model, self.PROMPT)
+
+        if st.session_state.db is None:
+            st.write("Firebaseの認証に失敗しました")
+
         self.display_chat_history()
 
         # チャットの開始
         if "user_id" in st.session_state and "group_id" in st.session_state:
-            if "chat_input_disabled" not in st.session_state:
-                st.session_state.chat_input_disabled = False
 
             if st.session_state.count >= 5:
                 group_url = (
@@ -183,10 +185,10 @@ class MainC:
                     {"role": "user", "content": user_input}
                 )
 
-                # AIからの応答を取得、データベースに登録
                 with st.spinner("Wait for it..."):
+                    # AIからの応答を取得、データベースに登録
                     assistant_response = self.generate_and_store_response(
-                        user_input, db
+                        user_input, st.session_state.db
                     )
 
                 # AIからの応答を表示
