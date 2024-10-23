@@ -133,6 +133,7 @@ class MainC:
         # チャットのメッセージの履歴作成と表示
         if "message_history" not in st.session_state:
             st.session_state.message_history = []
+            st.session_state.initge = ["はじめまして!!"]
 
         else:
             chat_placeholder = st.empty()
