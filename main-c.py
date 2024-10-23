@@ -136,8 +136,8 @@ class MainC:
             st.session_state.initge = ["はじめまして!!"]
 
         else:
-            chat_placeholder = st.empty()
-            with chat_placeholder.container():
+            st.session_state.chat_placeholder = st.empty()
+            with st.session_state.chat_placeholder.container():
                 message(
                     st.session_state.initge[0],
                     key="init_greeting_plus",
