@@ -145,7 +145,7 @@ class MainC:
                 )
                 for i in range(len(st.session_state.message_history)):
                     message(
-                        st.session_state.message_history[i],
+                        st.session_state.message_history[i]["content"],
                         is_user=True,
                         key=str(i),
                         avatar_style="adventurer",
@@ -153,7 +153,7 @@ class MainC:
                     )
                     key_generated = str(i) + "keyg"
                     message(
-                        st.session_state.message_history[i],
+                        st.session_state.message_history[i + 1]["content"],
                         key=str(key_generated),
                         avatar_style="micah",
                     )
