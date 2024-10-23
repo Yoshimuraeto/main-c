@@ -221,9 +221,6 @@ class MainC:
                     disabled=st.session_state.chat_input_disabled,
                     on_submit=self.disable_chat_input(),
                 ):
-                    # チャットメッセージコンテナにユーザーメッセージを表示
-                    st.chat_message("user").markdown(user_input)
-
                     # チャット履歴にユーザーメッセージを追加
                     st.session_state.message_history.append(
                         {"role": "user", "content": user_input}
