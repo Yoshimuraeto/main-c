@@ -121,7 +121,7 @@ class MainR:
 
     def prepare_model_with_memory(self):
         if "chat_history" not in st.session_state:
-            st.session_state.chat_history = []
+            st.session_state.chat_history = ["はじめまして!!", "こんにちは!"]
 
     def display_chat_history(self):
         # チャットのメッセージの履歴作成と表示
