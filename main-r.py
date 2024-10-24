@@ -38,11 +38,11 @@ class MainR:
             max_tokens=1024,
         )
         self.CONTEXTUALIZE_Q_SYSTEM_PROMPT = (
-            "チャット履歴と最新のユーザーの質問が与えられた場合、"
-            "チャット履歴の文脈を参照する可能性のある質問について、"
-            "チャット履歴なしで理解できる独立した質問を作成してください。"
-            "質問には回答せず、必要に応じて再構成し、"
-            "そうでない場合はそのまま返してください。"
+            "Given a chat history and the latest user question "
+            "which might reference context in the chat history, "
+            "formulate a standalone question which can be understood "
+            "without the chat history. Do NOT answer the question, "
+            "just reformulate it if needed and otherwise return it as is."
         )
         self.CHROMA_DB_PATH = "vector_database"
         self.embed = OpenAIEmbeddings(openai_api_key=st.secrets["OPENAI_API_KEY"])
@@ -61,10 +61,11 @@ class MainR:
             self.chat_model, self.vector_retriever, self.CONTEXTUALIZE_Q_PROMPT
         )
         self.SYSTEM_PREFIX = (
-            "あなたは質問応答タスクのためのアシスタントです。"
-            "以下の取得したコンテキストを使用して質問に答えてください。"
-            "答えがわからない場合は、わからないと言ってください。"
-            "3文以内で答えを簡潔にしてください。"
+            "You are an assistant for question-answering tasks. "
+            "Use the following pieces of retrieved context to answer "
+            "the question. If you don't know the answer, say that you "
+            "don't know. Use three sentences maximum and keep the "
+            "answer concise."
             "\n\n"
             "{context}"
         )
@@ -159,7 +160,7 @@ class MainR:
         # AIからの応答を取得
         assistant_response = self.rag_chain.invoke(
             {"input": user_input, "chat_history": st.session_state.chat_history}
-        )
+        )["answer"]
         # データベースに登録
         now = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
         doc_ref = db.collection(str(st.session_state.user_id)).document(str(now))
@@ -169,7 +170,7 @@ class MainR:
                 "asistant": assistant_response,
             }
         )
-        return assistant_response["answer"]
+        return assistant_response
 
     def disable_chat_input(self):
         st.session_state["chat_input_disabled"] = True
