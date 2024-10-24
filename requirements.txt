@@ -1,3 +1,4 @@
+python_version >= "3.9", < "3.11"
 openai
 langchain
 streamlit
@@ -8,5 +9,3 @@ chromadb
 langchain_community
 tiktoken
 protobuf==3.20.3
-
-python_version >= "3.9", < "3.11"
