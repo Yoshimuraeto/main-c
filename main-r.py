@@ -126,8 +126,10 @@ class MainR:
         qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
         rag_chain = create_retrieval_chain(history_aware_retriever, qa_chain)
 
+        chain = {"context": retriever} | self.PROMPT | self.chat_model
+
         st.session_state.conversational_rag_chain = RunnableWithMessageHistory(
-            rag_chain,
+            chain,
             self.get_session_history,
             input_messages_key="input",
             history_messages_key="chat_history",
