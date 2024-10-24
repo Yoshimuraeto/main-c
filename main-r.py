@@ -134,6 +134,7 @@ class MainR:
                 key="init_greeting_plus",
                 avatar_style="micah",
             )
+            # チャット履歴表示
             for i in range(len(st.session_state.message_history)):
                 message(
                     st.session_state.message_history[i]["user_content"],
