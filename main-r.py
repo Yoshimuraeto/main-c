@@ -170,7 +170,8 @@ class MainR:
         doc_ref.set(
             {
                 "user": user_input,
-                "asistant": assistant_response,
+                "asistant": assistant_response["answer"],
+                "context": assistant_response["context"],
             }
         )
         return assistant_response
