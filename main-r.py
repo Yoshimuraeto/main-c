@@ -131,9 +131,9 @@ class MainR:
                 key="init_greeting_plus",
                 avatar_style="micah",
             )
-            for i in range(len(st.session_state.message_history)):
+            for i in range(len(st.session_state.message_history[0]), step=2):
                 message(
-                    st.session_state.message_history[i][0],
+                    st.session_state.message_history[0][i],
                     is_user=True,
                     key=str(i),
                     avatar_style="adventurer",
@@ -141,7 +141,7 @@ class MainR:
                 )
                 key_generated = str(i) + "keyg"
                 message(
-                    st.session_state.message_history[i][1],
+                    st.session_state.message_history[0][i + 1],
                     key=str(key_generated),
                     avatar_style="micah",
                 )
