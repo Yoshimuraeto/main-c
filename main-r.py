@@ -121,8 +121,9 @@ class MainR:
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
             qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
-            rag_chain = create_retrieval_chain(self.history_aware_retriever, qa_chain)
-            return rag_chain
+            self.rag_chain = create_retrieval_chain(
+                self.history_aware_retriever, qa_chain
+            )
 
     def display_chat_history(self):
         # チャットのメッセージの履歴作成と表示
@@ -149,9 +150,9 @@ class MainR:
                     avatar_style="micah",
                 )
 
-    def generate_and_store_response(self, user_input, rag_chain, db):
+    def generate_and_store_response(self, user_input, db):
         # AIからの応答を取得
-        assistant_response = rag_chain.invoke(
+        assistant_response = self.rag_chain.invoke(
             {"input": user_input, "context": st.session_state.chat_history}
         )
         # データベースに登録
@@ -189,7 +190,7 @@ class MainR:
         st.session_state.chat_placeholder = st.empty()
         self.display_chat_history()
 
-        rag_chain = self.prepare_model_with_memory()
+        self.prepare_model_with_memory()
 
         if st.session_state.count >= 5:
             group_url = (
@@ -211,7 +212,7 @@ class MainR:
                 with st.spinner("Wait for it..."):
                     # AIからの応答を取得、データベースに登録
                     assistant_response = self.generate_and_store_response(
-                        user_input, rag_chain, st.session_state.db
+                        user_input, st.session_state.db
                     )
 
                 # チャット履歴にメッセージを追加
