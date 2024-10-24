@@ -84,6 +84,19 @@ class MainR:
             self.history_aware_retriever, self.qa_chain
         )
 
+        self.exam_prompt = ChatPromptTemplate.from_messages(
+            [
+                ("assistant", self.SYSTEM_PREFIX),
+                ("user", "{input}"),
+            ]
+        )
+        self.exam_qa_chain = create_stuff_documents_chain(
+            self.chat_model, self.exam_prompt
+        )
+        self.exam_rag_chain = create_retrieval_chain(
+            self.vector_retriever, self.exam_qa_chain
+        )
+
     def prepare_firestore(self):
         try:
             if not firebase_admin._apps:
@@ -163,7 +176,7 @@ class MainR:
 
     def generate_and_store_response(self, user_input, db):
         # AIからの応答を取得
-        assistant_response = self.rag_chain.invoke(
+        assistant_response = self.exam_rag_chain.invoke(
             {"input": user_input, "chat_history": st.session_state.chat_history}
         )
         # データベースに登録
