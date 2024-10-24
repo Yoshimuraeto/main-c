@@ -174,7 +174,7 @@ class MainR:
                 "context": assistant_response["context"],
             }
         )
-        return assistant_response
+        return assistant_response["answer"]
 
     def disable_chat_input(self):
         st.session_state["chat_input_disabled"] = True
