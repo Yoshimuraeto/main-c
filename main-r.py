@@ -113,7 +113,7 @@ class MainR:
                 get_session_history=self.get_session_history,
                 input_messages_key="input",
                 history_messages_key="chat_history",
-                output_messages_key="output",
+                context_messages_key="context",
             )
 
     def display_chat_history(self):
@@ -146,7 +146,7 @@ class MainR:
         assistant_response = st.session_state.runnable_with_history.invoke(
             {"input": user_input},
             config={"configurable": {"session_id": str(st.session_state.user_id)}},
-        )
+        ).content
 
         # データベースに登録
         now = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
