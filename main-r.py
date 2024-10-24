@@ -163,7 +163,7 @@ class MainR:
         # AIからの応答を取得
         assistant_response = self.rag_chain.invoke(
             {"input": user_input, "chat_history": st.session_state.chat_history}
-        )["answer"]
+        )
         # データベースに登録
         now = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
         doc_ref = db.collection(str(st.session_state.user_id)).document(str(now))
