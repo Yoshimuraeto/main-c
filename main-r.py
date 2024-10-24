@@ -60,7 +60,14 @@ class MainR:
         self.history_aware_retriever = create_history_aware_retriever(
             self.chat_model, self.vector_retriever, self.CONTEXTUALIZE_Q_PROMPT
         )
-        self.SYSTEM_PREFIX = "あなたはAIアシスタントです。 以下はAIアシスタントとの会話です。 このアシスタントは親切で、クリエイティブで、賢く、とてもフレンドリーです。"
+        self.SYSTEM_PREFIX = (
+            "あなたは質問応答タスクのためのアシスタントです。"
+            "以下の取得したコンテキストを使用して質問に答えてください。"
+            "答えがわからない場合は、わからないと言ってください。"
+            "3文以内で答えを簡潔にしてください。"
+            "\n\n"
+            "{context}"
+        )
         self.PROMPT = ChatPromptTemplate.from_messages(
             [
                 ("assistant", self.SYSTEM_PREFIX),
