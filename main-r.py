@@ -79,10 +79,6 @@ class MainR:
                 ("user", "{input}"),
             ]
         )
-        self.qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
-        self.rag_chain = create_retrieval_chain(
-            self.history_aware_retriever, self.qa_chain
-        )
 
     def prepare_firestore(self):
         try:
@@ -133,8 +129,10 @@ class MainR:
         return st.session_state.store[session_id]
 
     def prepare_model_with_memory(self):
+        qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
+        rag_chain = create_retrieval_chain(self.history_aware_retriever, qa_chain)
         st.session_state.conversational_rag_chain = RunnableWithMessageHistory(
-            self.rag_chain,
+            rag_chain,
             self.get_session_history,
             input_messages_key="input",
             history_messages_key="chat_history",
