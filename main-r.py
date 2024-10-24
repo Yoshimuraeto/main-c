@@ -25,7 +25,7 @@ from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
 
 
-class MainC:
+class MainR:
     def __init__(self):
         self.chat_model = ChatOpenAI(
             openai_api_key=st.secrets["OPENAI_API_KEY"],
@@ -169,7 +169,7 @@ class MainC:
         st.session_state.group_id = query_params.get("group", [None])[0]
 
     def forward(self):
-        st.title("Main C")
+        st.title("MainR")
 
         if "count" not in st.session_state:
             st.session_state.count = 0
@@ -225,5 +225,5 @@ class MainC:
 
 
 if __name__ == "__main__":
-    mainc = MainC()
+    mainc = MainR()
     mainc.forward()
