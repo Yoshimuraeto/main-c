@@ -20,6 +20,7 @@ from langchain_community.chat_message_histories import ChatMessageHistory
 
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.chains import create_history_aware_retriever
 
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
@@ -34,16 +35,13 @@ class MainR:
             streaming=True,
             max_tokens=1024,
         )
-        self.SYSTEM_PREFIX = """
-        あなたはAIアシスタントです。 以下はAIアシスタントとの会話です。 このアシスタントは親切で、クリエイティブで、賢く、とてもフレンドリーです。
-        次の文脈を活用して答えてください。
-        <ctx>
-        {context}
-        </ctx>
+        self.CONTEXTUALIZE_Q_SYSTEM_PROMPT = """
+        チャット履歴と最新のユーザーの質問が与えられた場合、チャット履歴の文脈を参照する可能性のある質問について、チャット履歴なしで理解できる独立した質問を作成してください。質問には回答せず、必要に応じて再構成し、そうでない場合はそのまま返してください。
         """
-        self.PROMPT = ChatPromptTemplate.from_messages(
+        self.SYSTEM_PREFIX = "あなたはAIアシスタントです。 以下はAIアシスタントとの会話です。 このアシスタントは親切で、クリエイティブで、賢く、とてもフレンドリーです。"
+        self.CONTEXTUALIZE_Q_PROMPT = ChatPromptTemplate.from_messages(
             [
-                ("assistant", self.SYSTEM_PREFIX),
+                ("assistant", self.CONTEXTUALIZE_Q_SYSTEM_PROMPT),
                 MessagesPlaceholder("chat_history"),
                 ("user", "{input}"),
             ]
@@ -54,6 +52,14 @@ class MainR:
             persist_directory=self.CHROMA_DB_PATH, embedding_function=self.embed
         )
         self.vector_retriever = self.vector_db.as_retriever(search_kwargs={"k": 3})
+        self.history_aware_retriever = create_history_aware_retriever(
+            self.chat_model, self.vector_retriever, self.CONTEXTUALIZE_Q_PROMPT
+        )
+        self.PROMPT = ChatPromptTemplate.from_messages(
+            ("assistant", self.SYSTEM_PREFIX),
+            MessagesPlaceholder("chat_history"),
+            ("user", "{input}"),
+        )
 
     def prepare_firestore(self):
         try:
@@ -106,15 +112,8 @@ class MainR:
     def prepare_model_with_memory(self):
         if not hasattr(st.session_state, "runnable_with_history"):
             qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
-            rag_chain = create_retrieval_chain(self.vector_retriever, qa_chain)
-            # RunnableWithMessageHistoryの準備
-            st.session_state.runnable_with_history = RunnableWithMessageHistory(
-                runnable=rag_chain,
-                get_session_history=self.get_session_history,
-                input_messages_key="input",
-                history_messages_key="chat_history",
-                context_messages_key="context",
-            )
+            rag_chain = create_retrieval_chain(self.history_aware_retriever, qa_chain)
+            return rag_chain
 
     def display_chat_history(self):
         # チャットのメッセージの履歴作成と表示
@@ -141,13 +140,11 @@ class MainR:
                     avatar_style="micah",
                 )
 
-    def generate_and_store_response(self, user_input, db):
+    def generate_and_store_response(self, user_input, rag_chain, db):
         # AIからの応答を取得
-        assistant_response = st.session_state.runnable_with_history.invoke(
-            {"input": user_input},
-            config={"configurable": {"session_id": str(st.session_state.user_id)}},
-        ).content
-
+        assistant_response = rag_chain.invoke(
+            {"input": user_input, "chat_history": st.session_state.message_history}
+        )["answer"]
         # データベースに登録
         now = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
         doc_ref = db.collection(str(st.session_state.user_id)).document(str(now))
@@ -183,7 +180,7 @@ class MainR:
         st.session_state.chat_placeholder = st.empty()
         self.display_chat_history()
 
-        self.prepare_model_with_memory()
+        rag_chain = self.prepare_model_with_memory()
 
         if st.session_state.count >= 5:
             group_url = (
@@ -205,7 +202,7 @@ class MainR:
                 with st.spinner("Wait for it..."):
                     # AIからの応答を取得、データベースに登録
                     assistant_response = self.generate_and_store_response(
-                        user_input, st.session_state.db
+                        user_input, rag_chain, st.session_state.db
                     )
 
                 # チャット履歴にメッセージを追加
