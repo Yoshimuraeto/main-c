@@ -64,7 +64,7 @@ class MainR:
         self.PROMPT = ChatPromptTemplate.from_messages(
             [
                 ("assistant", self.SYSTEM_PREFIX),
-                MessagesPlaceholder("chat_history"),
+                MessagesPlaceholder("context"),
                 ("user", "{input}"),
             ]
         )
@@ -118,7 +118,8 @@ class MainR:
         return st.session_state.store[session_id]
 
     def prepare_model_with_memory(self):
-        if not hasattr(st.session_state, "runnable_with_history"):
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = []
             qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
             rag_chain = create_retrieval_chain(self.history_aware_retriever, qa_chain)
             return rag_chain
@@ -133,9 +134,9 @@ class MainR:
                 key="init_greeting_plus",
                 avatar_style="micah",
             )
-            for i in range(len(st.session_state.message_history), step=2):
+            for i in range(len(st.session_state.message_history)):
                 message(
-                    st.session_state.message_history[i],
+                    st.session_state.message_history[i]["user_content"],
                     is_user=True,
                     key=str(i),
                     avatar_style="adventurer",
@@ -143,7 +144,7 @@ class MainR:
                 )
                 key_generated = str(i) + "keyg"
                 message(
-                    st.session_state.message_history[i + 1],
+                    st.session_state.message_history[i]["assistant_content"],
                     key=str(key_generated),
                     avatar_style="micah",
                 )
@@ -151,7 +152,7 @@ class MainR:
     def generate_and_store_response(self, user_input, rag_chain, db):
         # AIからの応答を取得
         assistant_response = rag_chain.invoke(
-            {"input": user_input, "chat_history": st.session_state.message_history}
+            {"input": user_input, "chat_history": st.session_state.chat_history}
         )
         # データベースに登録
         now = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
@@ -214,11 +215,17 @@ class MainR:
                     )
 
                 # チャット履歴にメッセージを追加
-                st.session_state.message_history.extend(
+                st.session_state.chat_history.extend(
                     [
                         HumanMessage(content=user_input),
                         AIMessage(content=assistant_response),
                     ]
+                )
+                st.session_state.message_history.append(
+                    {
+                        "user_content": user_input,
+                        "assistant_content": assistant_response,
+                    }
                 )
 
                 st.session_state.count += 1
