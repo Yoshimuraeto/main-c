@@ -112,7 +112,7 @@ class MainR:
                 rag_chain,
                 self.get_session_history,
                 input_messages_key="input",
-                history_messages_key="history",
+                history_messages_key="chat_history",
                 output_messages_key="output",
             )
 
@@ -222,5 +222,5 @@ class MainR:
 
 
 if __name__ == "__main__":
-    mainc = MainR()
-    mainc.forward()
+    mainr = MainR()
+    mainr.forward()
