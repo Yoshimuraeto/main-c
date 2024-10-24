@@ -109,11 +109,11 @@ class MainR:
             rag_chain = create_retrieval_chain(self.vector_retriever, qa_chain)
             # RunnableWithMessageHistoryの準備
             st.session_state.runnable_with_history = RunnableWithMessageHistory(
-                rag_chain,
-                self.get_session_history,
+                runnable=rag_chain,
+                get_session_history=self.get_session_history,
                 input_messages_key="input",
                 history_messages_key="chat_history",
-                output_messages_key="output",
+                output_messages_key="answer",
             )
 
     def display_chat_history(self):
@@ -146,7 +146,7 @@ class MainR:
         assistant_response = st.session_state.runnable_with_history.invoke(
             {"input": user_input},
             config={"configurable": {"session_id": str(st.session_state.user_id)}},
-        )["output"]
+        )
 
         # データベースに登録
         now = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
@@ -174,7 +174,6 @@ class MainR:
         if "chat_input_disabled" not in st.session_state:
             st.session_state.chat_input_disabled = False
             st.session_state.db = self.prepare_firestore()
-            self.prepare_model_with_memory()
             self.get_ids()
             st.session_state.initge = ["はじめまして!!"]
 
@@ -183,6 +182,8 @@ class MainR:
 
         st.session_state.chat_placeholder = st.empty()
         self.display_chat_history()
+
+        self.prepare_model_with_memory()
 
         if st.session_state.count >= 5:
             group_url = (
