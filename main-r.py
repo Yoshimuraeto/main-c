@@ -119,9 +119,7 @@ class MainR:
         vector_db = Chroma(
             persist_directory=self.CHROMA_DB_PATH, embedding_function=self.embed
         )
-        retriever = vector_db.as_retriever(
-            search_kwargs={"k": 8, "score_threshold": 0.3}
-        )
+        retriever = vector_db.as_retriever(search_kwargs={"k": 8})
         history_aware_retriever = create_history_aware_retriever(
             self.chat_model, retriever, self.CONTEXTUALIZE_Q_PROMPT
         )
