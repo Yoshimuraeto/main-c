@@ -64,7 +64,7 @@ class MainR:
         self.PROMPT = ChatPromptTemplate.from_messages(
             [
                 ("assistant", self.SYSTEM_PREFIX),
-                MessagesPlaceholder("chat_history"),
+                MessagesPlaceholder("context"),
                 ("user", "{input}"),
             ]
         )
@@ -134,7 +134,6 @@ class MainR:
                 key="init_greeting_plus",
                 avatar_style="micah",
             )
-            # チャット履歴表示
             for i in range(len(st.session_state.message_history)):
                 message(
                     st.session_state.message_history[i]["user_content"],
@@ -153,7 +152,7 @@ class MainR:
     def generate_and_store_response(self, user_input, rag_chain, db):
         # AIからの応答を取得
         assistant_response = rag_chain.invoke(
-            {"input": user_input, "chat_history": st.session_state.chat_history}
+            {"input": user_input, "context": st.session_state.chat_history}
         )
         # データベースに登録
         now = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
