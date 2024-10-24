@@ -136,7 +136,7 @@ class MainR:
         st.session_state.conversational_rag_chain = RunnableWithMessageHistory(
             self.rag_chain,
             self.get_session_history,
-            input
+            input_messages_key="input",
             history_messages_key="chat_history",
             output_messages_key="answer",
         )
