@@ -1,6 +1,6 @@
 firebase_admin
 pysqlite3-binary
-chromadb == chromadb==0.3.29
+chromadb == 0.3.29
 tiktoken
 openai
 langchain
