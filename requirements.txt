@@ -1,9 +1,10 @@
-firebase_admin
-pysqlite3-binary
-chromadb == 0.3.29
-tiktoken
 openai
 langchain
-langchain_community
 streamlit
 streamlit_chat
+firebase_admin
+pysqlite3-binary
+chromadb 
+langchain_community
+tiktoken
+protobuf==3.20.3
