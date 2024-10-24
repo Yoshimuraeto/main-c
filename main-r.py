@@ -164,7 +164,7 @@ class MainR:
         st.session_state["chat_input_disabled"] = False
 
     def get_ids(self):
-        query_params = st.query_params()
+        query_params = st.experimental_get_query_params()
         st.session_state.user_id = query_params.get("user_id", [None])[0]
         st.session_state.group_id = query_params.get("group", [None])[0]
 
