@@ -64,7 +64,7 @@ class MainR:
         self.PROMPT = ChatPromptTemplate.from_messages(
             [
                 ("assistant", self.SYSTEM_PREFIX),
-                MessagesPlaceholder("context"),
+                MessagesPlaceholder("chat_history"),
                 ("user", "{input}"),
             ]
         )
