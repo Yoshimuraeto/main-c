@@ -37,9 +37,6 @@ class MainR:
         self.SYSTEM_PREFIX = """
         あなたはAIアシスタントです。 以下はAIアシスタントとの会話です。 このアシスタントは親切で、クリエイティブで、賢く、とてもフレンドリーです。
         次の文脈を活用して答えてください。
-        <hs>
-        {history}
-        </hs>
         <ctx>
         {context}
         </ctx>
@@ -47,7 +44,7 @@ class MainR:
         self.PROMPT = ChatPromptTemplate.from_messages(
             [
                 ("assistant", self.SYSTEM_PREFIX),
-                MessagesPlaceholder("history"),
+                MessagesPlaceholder("chat_history"),
                 ("user", "{input}"),
             ]
         )
