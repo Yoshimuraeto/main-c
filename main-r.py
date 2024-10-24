@@ -57,9 +57,6 @@ class MainR:
                 ("user", "{input}"),
             ]
         )
-        self.history_aware_retriever = create_history_aware_retriever(
-            self.chat_model, self.vector_retriever, self.CONTEXTUALIZE_Q_PROMPT
-        )
         self.SYSTEM_PREFIX = """
             今日の出来事を振り返って、ユーザーに自由に感想を語ってもらいましょう。適度な問いかけを行って、会話を促進してください。
             私の日記情報も添付します。
@@ -129,8 +126,11 @@ class MainR:
         return st.session_state.store[session_id]
 
     def prepare_model_with_memory(self):
+        history_aware_retriever = create_history_aware_retriever(
+            self.chat_model, self.vector_retriever, self.CONTEXTUALIZE_Q_PROMPT
+        )
         qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
-        rag_chain = create_retrieval_chain(self.history_aware_retriever, qa_chain)
+        rag_chain = create_retrieval_chain(history_aware_retriever, qa_chain)
         st.session_state.conversational_rag_chain = RunnableWithMessageHistory(
             rag_chain,
             self.get_session_history,
