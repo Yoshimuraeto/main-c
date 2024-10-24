@@ -68,6 +68,8 @@ class MainR:
                 ("user", "{input}"),
             ]
         )
+        qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
+        self.rag_chain = create_retrieval_chain(self.history_aware_retriever, qa_chain)
 
     def prepare_firestore(self):
         try:
@@ -120,10 +122,6 @@ class MainR:
     def prepare_model_with_memory(self):
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
-            qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
-            self.rag_chain = create_retrieval_chain(
-                self.history_aware_retriever, qa_chain
-            )
 
     def display_chat_history(self):
         # チャットのメッセージの履歴作成と表示
