@@ -14,6 +14,8 @@ from langchain.prompts.chat import (
     MessagesPlaceholder,
 )
 
+from langchain_core.messages import AIMessage, HumanMessage
+
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_community.chat_message_histories import ChatMessageHistory
@@ -206,11 +208,11 @@ class MainR:
                     )
 
                 # チャット履歴にメッセージを追加
-                st.session_state.message_history.append(
-                    {
-                        "user_content": user_input,
-                        "assistant_content": assistant_response,
-                    }
+                st.session_state.message_history.extend(
+                    [
+                        HumanMessage(content=user_input),
+                        AIMessage(content=assistant_response),
+                    ]
                 )
 
                 st.session_state.count += 1
