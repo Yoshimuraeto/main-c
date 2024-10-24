@@ -84,19 +84,6 @@ class MainR:
             self.history_aware_retriever, self.qa_chain
         )
 
-        self.exam_prompt = ChatPromptTemplate.from_messages(
-            [
-                ("assistant", self.SYSTEM_PREFIX),
-                ("user", "{input}"),
-            ]
-        )
-        self.exam_qa_chain = create_stuff_documents_chain(
-            self.chat_model, self.exam_prompt
-        )
-        self.exam_rag_chain = create_retrieval_chain(
-            self.vector_retriever, self.exam_qa_chain
-        )
-
     def prepare_firestore(self):
         try:
             if not firebase_admin._apps:
@@ -146,8 +133,13 @@ class MainR:
         return st.session_state.store[session_id]
 
     def prepare_model_with_memory(self):
-        if "chat_history" not in st.session_state:
-            st.session_state.chat_history = []
+        st.session_state.conversational_rag_chain = RunnableWithMessageHistory(
+            self.rag_chain,
+            self.get_session_history,
+            input
+            history_messages_key="chat_history",
+            output_messages_key="answer",
+        )
 
     def display_chat_history(self):
         # チャットのメッセージの履歴作成と表示
@@ -176,8 +168,9 @@ class MainR:
 
     def generate_and_store_response(self, user_input, db):
         # AIからの応答を取得
-        assistant_response = self.exam_rag_chain.invoke(
-            {"input": user_input, "chat_history": st.session_state.chat_history}
+        assistant_response = st.session_state.conversational_rag_chain.invoke(
+            {"input": user_input},
+            config={"configurable": {"session_id": str(st.session_state.user_id)}},
         )
         # データベースに登録
         now = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
@@ -246,12 +239,6 @@ class MainR:
                     )
 
                 # チャット履歴にメッセージを追加
-                st.session_state.chat_history.extend(
-                    [
-                        HumanMessage(content=user_input),
-                        AIMessage(content=assistant_response),
-                    ]
-                )
                 st.session_state.message_history.append(
                     {
                         "user_content": user_input,
