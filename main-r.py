@@ -27,6 +27,8 @@ from langchain.chains import create_history_aware_retriever
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
 
+from langchain_core.runnables import RunnablePassthrough
+
 
 class MainR:
     def __init__(self):
@@ -126,10 +128,14 @@ class MainR:
         qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
         rag_chain = create_retrieval_chain(history_aware_retriever, qa_chain)
 
-        chain = {"context": retriever} | self.PROMPT | self.chat_model
+        st.session_state.chain = (
+            {"context": retriever, "input": RunnablePassthrough()}
+            | self.PROMPT
+            | self.chat_model
+        )
 
         st.session_state.conversational_rag_chain = RunnableWithMessageHistory(
-            chain,
+            rag_chain,
             self.get_session_history,
             input_messages_key="input",
             history_messages_key="chat_history",
@@ -163,10 +169,7 @@ class MainR:
 
     def generate_and_store_response(self, user_input, db):
         # AIからの応答を取得
-        assistant_response = st.session_state.conversational_rag_chain.invoke(
-            {"input": user_input},
-            config={"configurable": {"session_id": str(st.session_state.user_id)}},
-        )
+        assistant_response = st.session_state.chain.invoke(user_input)
         # データベースに登録
         now = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
         doc_ref = db.collection(str(st.session_state.user_id)).document(str(now))
