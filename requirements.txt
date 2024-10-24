@@ -1,5 +1,6 @@
 openai
 langchain_community
+langchain-openai
 streamlit_chat
 streamlit
 firebase_admin
