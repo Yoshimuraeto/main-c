@@ -26,8 +26,7 @@ from langchain.chains import create_history_aware_retriever
 
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
-
-import chromadb
+from langchain_core.vectorstores import InMemoryVectorStore
 
 
 class MainR:
@@ -118,13 +117,13 @@ class MainR:
         return st.session_state.store[session_id]
 
     def prepare_model_with_memory(self):
-        client = chromadb.PersistentClient(path=self.CHROMA_DB_PATH)
         vector_db = Chroma(
-            persist_directory=self.CHROMA_DB_PATH,
-            embedding_function=self.embed,
-            client=client,
+            persist_directory=self.CHROMA_DB_PATH, embedding_function=self.embed
         )
-        retriever = vector_db.as_retriever()
+        vectorstore = InMemoryVectorStore.load(
+            self.CHROMA_DB_PATH, embedding_function=self.embed
+        )
+        retriever = vectorstore.as_retriever()
         history_aware_retriever = create_history_aware_retriever(
             self.chat_model, retriever, self.CONTEXTUALIZE_Q_PROMPT
         )
