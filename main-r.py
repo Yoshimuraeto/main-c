@@ -45,7 +45,9 @@ class MainR:
             "just reformulate it if needed and otherwise return it as is."
         )
         self.CHROMA_DB_PATH = "vector_database/the_Garden_of_sinners"
-        self.embed = OpenAIEmbeddings(openai_api_key=st.secrets["OPENAI_API_KEY"])
+        self.embed = OpenAIEmbeddings(
+            openai_api_key=st.secrets["OPENAI_API_KEY"],
+        )
         self.CONTEXTUALIZE_Q_PROMPT = ChatPromptTemplate.from_messages(
             [
                 ("assistant", self.CONTEXTUALIZE_Q_SYSTEM_PROMPT),
@@ -118,8 +120,11 @@ class MainR:
             persist_directory=self.CHROMA_DB_PATH, embedding_function=self.embed
         )
         vector_retriever = vector_db.as_retriever()
+        history_aware_retriever = create_history_aware_retriever(
+            self.chat_model, vector_retriever, self.CONTEXTUALIZE_Q_PROMPT
+        )
         qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
-        rag_chain = create_retrieval_chain(vector_retriever, qa_chain)
+        rag_chain = create_retrieval_chain(history_aware_retriever, qa_chain)
         st.session_state.conversational_rag_chain = RunnableWithMessageHistory(
             rag_chain,
             self.get_session_history,
