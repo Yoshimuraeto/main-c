@@ -62,9 +62,11 @@ class MainR:
         )
         self.SYSTEM_PREFIX = "あなたはAIアシスタントです。 以下はAIアシスタントとの会話です。 このアシスタントは親切で、クリエイティブで、賢く、とてもフレンドリーです。"
         self.PROMPT = ChatPromptTemplate.from_messages(
-            ("assistant", self.SYSTEM_PREFIX),
-            MessagesPlaceholder("chat_history"),
-            ("user", "{input}"),
+            [
+                ("assistant", self.SYSTEM_PREFIX),
+                MessagesPlaceholder("chat_history"),
+                ("user", "{input}"),
+            ]
         )
 
     def prepare_firestore(self):
@@ -131,9 +133,9 @@ class MainR:
                 key="init_greeting_plus",
                 avatar_style="micah",
             )
-            for i in range(len(st.session_state.message_history[0]), step=2):
+            for i in range(len(st.session_state.message_history), step=2):
                 message(
-                    st.session_state.message_history[0][i],
+                    st.session_state.message_history[i],
                     is_user=True,
                     key=str(i),
                     avatar_style="adventurer",
@@ -141,7 +143,7 @@ class MainR:
                 )
                 key_generated = str(i) + "keyg"
                 message(
-                    st.session_state.message_history[0][i + 1],
+                    st.session_state.message_history[i + 1],
                     key=str(key_generated),
                     avatar_style="micah",
                 )
