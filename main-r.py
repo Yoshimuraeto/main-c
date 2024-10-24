@@ -118,11 +118,8 @@ class MainR:
             persist_directory=self.CHROMA_DB_PATH, embedding_function=self.embed
         )
         vector_retriever = vector_db.as_retriever()
-        history_aware_retriever = create_history_aware_retriever(
-            self.chat_model, vector_retriever, self.CONTEXTUALIZE_Q_PROMPT
-        )
         qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
-        rag_chain = create_retrieval_chain(history_aware_retriever, qa_chain)
+        rag_chain = create_retrieval_chain(vector_retriever, qa_chain)
         st.session_state.conversational_rag_chain = RunnableWithMessageHistory(
             rag_chain,
             self.get_session_history,
