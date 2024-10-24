@@ -119,12 +119,32 @@ class MainR:
         vector_db = Chroma(
             persist_directory=self.CHROMA_DB_PATH, embedding_function=self.embed
         )
-        vector_retriever = vector_db.as_retriever()
+        retriever = vector_db.as_retriever()
         history_aware_retriever = create_history_aware_retriever(
-            self.chat_model, vector_retriever, self.CONTEXTUALIZE_Q_PROMPT
+            self.chat_model, retriever, self.CONTEXTUALIZE_Q_PROMPT
         )
         qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
         rag_chain = create_retrieval_chain(history_aware_retriever, qa_chain)
+
+        system_prompt = (
+            "You are an assistant for question-answering tasks. "
+            "Use the following pieces of retrieved context to answer "
+            "the question. If you don't know the answer, say that you "
+            "don't know. Use three sentences maximum and keep the "
+            "answer concise."
+            "\n\n"
+            "{context}"
+        )
+
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", system_prompt),
+                ("human", "{input}"),
+            ]
+        )
+
+        question_answer_chain = create_stuff_documents_chain(self.chat_model, prompt)
+        rag_chain = create_retrieval_chain(retriever, question_answer_chain)
         st.session_state.conversational_rag_chain = RunnableWithMessageHistory(
             rag_chain,
             self.get_session_history,
