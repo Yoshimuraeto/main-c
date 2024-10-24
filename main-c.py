@@ -151,7 +151,7 @@ class MainC:
         st.session_state.group_id = query_params.get("group", [None])[0]
 
     def forward(self):
-        st.title("Main C")
+        st.title("MainC")
 
         if "count" not in st.session_state:
             st.session_state.count = 0
