@@ -37,16 +37,12 @@ class MainR:
             streaming=True,
             max_tokens=1024,
         )
-        self.CONTEXTUALIZE_Q_SYSTEM_PROMPT = """
-        チャット履歴と最新のユーザーの質問が与えられた場合、チャット履歴の文脈を参照する可能性のある質問について、チャット履歴なしで理解できる独立した質問を作成してください。質問には回答せず、必要に応じて再構成し、そうでない場合はそのまま返してください。
-        """
-        self.SYSTEM_PREFIX = "あなたはAIアシスタントです。 以下はAIアシスタントとの会話です。 このアシスタントは親切で、クリエイティブで、賢く、とてもフレンドリーです。"
-        self.CONTEXTUALIZE_Q_PROMPT = ChatPromptTemplate.from_messages(
-            [
-                ("assistant", self.CONTEXTUALIZE_Q_SYSTEM_PROMPT),
-                MessagesPlaceholder("chat_history"),
-                ("user", "{input}"),
-            ]
+        self.CONTEXTUALIZE_Q_SYSTEM_PROMPT = (
+            "チャット履歴と最新のユーザーの質問が与えられた場合、"
+            "チャット履歴の文脈を参照する可能性のある質問について、"
+            "チャット履歴なしで理解できる独立した質問を作成してください。"
+            "質問には回答せず、必要に応じて再構成し、"
+            "そうでない場合はそのまま返してください。"
         )
         self.CHROMA_DB_PATH = "vector_database"
         self.embed = OpenAIEmbeddings(openai_api_key=st.secrets["OPENAI_API_KEY"])
@@ -54,9 +50,17 @@ class MainR:
             persist_directory=self.CHROMA_DB_PATH, embedding_function=self.embed
         )
         self.vector_retriever = self.vector_db.as_retriever(search_kwargs={"k": 3})
+        self.CONTEXTUALIZE_Q_PROMPT = ChatPromptTemplate.from_messages(
+            [
+                ("assistant", self.CONTEXTUALIZE_Q_SYSTEM_PROMPT),
+                MessagesPlaceholder("chat_history"),
+                ("user", "{input}"),
+            ]
+        )
         self.history_aware_retriever = create_history_aware_retriever(
             self.chat_model, self.vector_retriever, self.CONTEXTUALIZE_Q_PROMPT
         )
+        self.SYSTEM_PREFIX = "あなたはAIアシスタントです。 以下はAIアシスタントとの会話です。 このアシスタントは親切で、クリエイティブで、賢く、とてもフレンドリーです。"
         self.PROMPT = ChatPromptTemplate.from_messages(
             ("assistant", self.SYSTEM_PREFIX),
             MessagesPlaceholder("chat_history"),
@@ -129,7 +133,7 @@ class MainR:
             )
             for i in range(len(st.session_state.message_history)):
                 message(
-                    st.session_state.message_history[i]["user_content"],
+                    st.session_state.message_history[i][0],
                     is_user=True,
                     key=str(i),
                     avatar_style="adventurer",
@@ -137,7 +141,7 @@ class MainR:
                 )
                 key_generated = str(i) + "keyg"
                 message(
-                    st.session_state.message_history[i]["assistant_content"],
+                    st.session_state.message_history[i][1],
                     key=str(key_generated),
                     avatar_style="micah",
                 )
