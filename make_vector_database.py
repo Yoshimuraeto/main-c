@@ -5,11 +5,11 @@ from langchain.vectorstores import Chroma
 import streamlit as st
 
 
-CHROMA_DB_PATH = "vector_database"
+CHROMA_DB_PATH = "vector_database/diary"
 
 
 def embed_data():
-    loader = CSVLoader(file_path="liquid_neural_network.csv", encoding="utf-8")
+    loader = CSVLoader(file_path="diary.csv", encoding="utf-8")
     documents = loader.load()
     text_splitter = CharacterTextSplitter(chunk_size=800, chunk_overlap=0)
     texts = text_splitter.split_documents(documents)
