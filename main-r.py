@@ -79,8 +79,10 @@ class MainR:
                 ("user", "{input}"),
             ]
         )
-        qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
-        self.rag_chain = create_retrieval_chain(self.history_aware_retriever, qa_chain)
+        self.qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
+        self.rag_chain = create_retrieval_chain(
+            self.history_aware_retriever, self.qa_chain
+        )
 
     def prepare_firestore(self):
         try:
