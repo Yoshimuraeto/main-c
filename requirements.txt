@@ -4,3 +4,4 @@ langchain-openai
 streamlit_chat
 streamlit
 firebase_admin
+Chromadb
