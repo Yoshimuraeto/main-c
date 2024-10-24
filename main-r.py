@@ -44,7 +44,7 @@ class MainR:
             "without the chat history. Do NOT answer the question, "
             "just reformulate it if needed and otherwise return it as is."
         )
-        self.CHROMA_DB_PATH = "vector_database/diary"
+        self.CHROMA_DB_PATH = "vector_database/the_Garden_of_sinners"
         self.embed = OpenAIEmbeddings(openai_api_key=st.secrets["OPENAI_API_KEY"])
         self.vector_db = Chroma(
             persist_directory=self.CHROMA_DB_PATH, embedding_function=self.embed
