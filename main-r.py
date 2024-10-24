@@ -146,7 +146,7 @@ class MainR:
         assistant_response = st.session_state.runnable_with_history.invoke(
             {"input": user_input},
             config={"configurable": {"session_id": str(st.session_state.user_id)}},
-        )
+        )["answer"].content
 
         # データベースに登録
         now = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
