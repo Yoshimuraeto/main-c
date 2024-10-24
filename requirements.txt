@@ -1,8 +1,8 @@
-openai
-langchain
 streamlit
 streamlit_chat
 firebase_admin
 chromadb 
-langchain_community
 tiktoken
+openai
+langchain
+langchain_community
