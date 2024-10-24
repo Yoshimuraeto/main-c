@@ -7,3 +7,4 @@ streamlit_chat
 tiktoken
 firebase_admin
 chromadb
+opentelemetry
