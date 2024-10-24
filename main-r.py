@@ -49,7 +49,7 @@ class MainR:
         self.vector_db = Chroma(
             persist_directory=self.CHROMA_DB_PATH, embedding_function=self.embed
         )
-        self.vector_retriever = self.vector_db.as_retriever(search_kwargs={"k": 8})
+        self.vector_retriever = self.vector_db.as_retriever()
         self.CONTEXTUALIZE_Q_PROMPT = ChatPromptTemplate.from_messages(
             [
                 ("assistant", self.CONTEXTUALIZE_Q_SYSTEM_PROMPT),
