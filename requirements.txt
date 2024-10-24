@@ -1,9 +1,9 @@
-streamlit
-streamlit_chat
 firebase_admin
-chromadb 
+pysqlite3-binary
+chromadb == chromadb==0.3.29
 tiktoken
 openai
 langchain
 langchain_community
-pysqlite3-binary
+streamlit
+streamlit_chat
