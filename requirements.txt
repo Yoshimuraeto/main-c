@@ -1,9 +1,7 @@
 streamlit
 streamlit_chat
 firebase_admin
-chromadb 
 tiktoken
 openai
 langchain
 langchain_community
-pysqlite3-binary
