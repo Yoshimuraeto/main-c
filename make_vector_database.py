@@ -9,9 +9,8 @@ name = "the_Garden_of_sinners"
 
 CHROMA_DB_PATH = f"vector_database/{name}"
 
-loader = TextLoader("the_Garden_of_sinners.txt", encoding="utf-8")
+loader = TextLoader(f"{name}.txt", encoding="utf-8")
 data = loader.load()
-print(data)
 
 text_splitter = CharacterTextSplitter(
     separator="\n\n", chunk_size=900, chunk_overlap=0, length_function=len
@@ -28,7 +27,7 @@ embed = OpenAIEmbeddings(openai_api_key=key)
 db = Chroma.from_documents(
     documents=documents,
     embedding=embed,
-    persist_directory="vector_database/the_Garden_of_sinners",
+    persist_directory=CHROMA_DB_PATH,
 )
 if db:
     db.persist()
