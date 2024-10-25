@@ -26,7 +26,6 @@ from langchain.chains import create_history_aware_retriever
 
 from langchain_community.vectorstores import Chroma
 from langchain_openai import OpenAIEmbeddings
-from langchain_core.vectorstores import InMemoryVectorStore
 
 
 class MainR:
@@ -117,19 +116,21 @@ class MainR:
         return st.session_state.store[session_id]
 
     def prepare_model_with_memory(self):
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = []
         vector_db = Chroma(
             persist_directory=self.CHROMA_DB_PATH, embedding_function=self.embed
         )
-        vectorstore = InMemoryVectorStore.load(
-            self.CHROMA_DB_PATH, embedding_function=self.embed
-        )
-        retriever = vectorstore.as_retriever()
+        retriever = vector_db.as_retriever()
         history_aware_retriever = create_history_aware_retriever(
             self.chat_model, retriever, self.CONTEXTUALIZE_Q_PROMPT
         )
         qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
-        rag_chain = create_retrieval_chain(history_aware_retriever, qa_chain)
+        st.session_state.rag_chain = create_retrieval_chain(
+            history_aware_retriever, qa_chain
+        )
 
+        """
         st.session_state.conversational_rag_chain = RunnableWithMessageHistory(
             rag_chain,
             self.get_session_history,
@@ -137,6 +138,7 @@ class MainR:
             history_messages_key="chat_history",
             output_messages_key="answer",
         )
+        """
 
     def display_chat_history(self):
         # チャットのメッセージの履歴作成と表示
@@ -165,8 +167,8 @@ class MainR:
 
     def generate_and_store_response(self, user_input, db):
         # AIからの応答を取得
-        assistant_response = st.session_state.conversational_rag_chain.invoke(
-            {"input": user_input},
+        assistant_response = st.session_state.rag_chain.invoke(
+            {"chat_history": st.session_state.chat_history, "input": user_input},
             config={"configurable": {"session_id": str(st.session_state.user_id)}},
         )
         # データベースに登録
@@ -236,6 +238,10 @@ class MainR:
                     )
 
                 # チャット履歴にメッセージを追加
+                st.session_state.chat_history.extend(
+                    HumanMessage(content=user_input),
+                    AIMessage(content=assistant_response),
+                )
                 st.session_state.message_history.append(
                     {
                         "user_content": user_input,
