@@ -122,12 +122,12 @@ class MainR:
             persist_directory=self.CHROMA_DB_PATH, embedding_function=self.embed
         )
         retriever = vector_db.as_retriever()
-        history_aware_retriever = create_history_aware_retriever(
+        st.session_state.history_aware_retriever = create_history_aware_retriever(
             self.chat_model, retriever, self.CONTEXTUALIZE_Q_PROMPT
         )
         qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
         st.session_state.rag_chain = create_retrieval_chain(
-            history_aware_retriever, qa_chain
+            st.session_state.history_aware_retriever, qa_chain
         )
 
         """
@@ -167,6 +167,10 @@ class MainR:
 
     def generate_and_store_response(self, user_input, db):
         # AIからの応答を取得
+        context = st.session_state.history_aware_retriever.invoke(
+            {"chat_history": st.session_state.chat_history, "input": user_input},
+        )
+        st.write(context)
         assistant_response = st.session_state.rag_chain.invoke(
             {"chat_history": st.session_state.chat_history, "input": user_input},
             config={"configurable": {"session_id": str(st.session_state.user_id)}},
@@ -239,8 +243,10 @@ class MainR:
 
                 # チャット履歴にメッセージを追加
                 st.session_state.chat_history.extend(
-                    HumanMessage(content=user_input),
-                    AIMessage(content=assistant_response),
+                    [
+                        HumanMessage(content=user_input),
+                        AIMessage(content=assistant_response),
+                    ]
                 )
                 st.session_state.message_history.append(
                     {
