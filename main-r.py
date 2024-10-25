@@ -121,6 +121,7 @@ class MainR:
         vector_db = Chroma(
             persist_directory=self.CHROMA_DB_PATH, embedding_function=self.embed
         )
+        st.write("vector_db", vector_db._collection.count())
         retriever = vector_db.as_retriever()
         st.session_state.history_aware_retriever = create_history_aware_retriever(
             self.chat_model, retriever, self.CONTEXTUALIZE_Q_PROMPT
