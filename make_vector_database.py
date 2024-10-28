@@ -23,7 +23,10 @@ with open("text_chunks.txt", "w", encoding="utf-8") as file:
         file.write("\n--------------------------------------\n")
 
 key = st.secrets["OPENAI_API_KEY"]
-embed = OpenAIEmbeddings(openai_api_key=key)
+embed = OpenAIEmbeddings(
+    openai_api_key=key,
+    model="text-embedding-3-large",
+)
 db = Chroma.from_documents(
     documents=documents,
     embedding=embed,

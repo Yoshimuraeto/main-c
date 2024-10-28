@@ -52,6 +52,7 @@ class MainR:
         self.CHROMA_DB_PATH = ".\vector_database\the_Garden_of_sinners"
         self.embed = OpenAIEmbeddings(
             openai_api_key=st.secrets["OPENAI_API_KEY"],
+            model="text-embedding-3-large",
         )
         self.CONTEXTUALIZE_Q_PROMPT = ChatPromptTemplate.from_messages(
             [
