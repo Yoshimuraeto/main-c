@@ -49,11 +49,14 @@ class MainR:
             "without the chat history. Do NOT answer the question, "
             "just reformulate it if needed and otherwise return it as is."
         )
+
         self.CHROMA_DB_PATH = ".\vector_database\the_Garden_of_sinners"
+
         self.embed = OpenAIEmbeddings(
             openai_api_key=st.secrets["OPENAI_API_KEY"],
             model="text-embedding-3-large",
         )
+
         self.CONTEXTUALIZE_Q_PROMPT = ChatPromptTemplate.from_messages(
             [
                 ("assistant", self.CONTEXTUALIZE_Q_SYSTEM_PROMPT),
@@ -61,10 +64,12 @@ class MainR:
                 ("user", "{input}"),
             ]
         )
+
         self.SYSTEM_PREFIX = """あなたはAIエージェントです。
         以下のcontextに基づいて質問に回答して下さい。
         
         {context}"""
+
         self.PROMPT = ChatPromptTemplate.from_messages(
             [
                 ("assistant", self.SYSTEM_PREFIX),
@@ -208,7 +213,7 @@ class MainR:
         from langchain.document_loaders import TextLoader
 
         name = "the_Garden_of_sinners"
-        loader = TextLoader(f"{name}.txt", encoding="utf-8")
+        loader = TextLoader(f"vector_database/{name}.txt", encoding="utf-8")
         data = loader.load()
         st.write(data)
 
