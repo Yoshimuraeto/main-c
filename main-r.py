@@ -129,23 +129,9 @@ class MainR:
     def prepare_model_with_memory(self):
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
-        name = "the_Garden_of_sinners"
-        CHROMA_DB_PATH = f"vector_database/{name}"
-        from langchain.document_loaders import TextLoader
-        from langchain.text_splitter import CharacterTextSplitter
-
-        loader = TextLoader(f"{name}.txt", encoding="utf-8")
-        data = loader.load()
-        text_splitter = CharacterTextSplitter(
-            separator="\n\n", chunk_size=900, chunk_overlap=0, length_function=len
+        vector_db = Chroma(
+            persist_directory=self.CHROMA_DB_PATH, embedding_function=self.embed
         )
-        documents = text_splitter.create_documents([doc.page_content for doc in data])
-        vector_db = Chroma.from_documents(
-            documents=documents,
-            embedding=self.embed,
-            persist_directory=CHROMA_DB_PATH,
-        )
-        st.write("vector_db", vector_db._collection.count())
         retriever = vector_db.as_retriever()
         st.session_state.history_aware_retriever = create_history_aware_retriever(
             self.chat_model, retriever, self.CONTEXTUALIZE_Q_PROMPT
@@ -222,13 +208,6 @@ class MainR:
 
     def forward(self):
         st.title("MainR")
-
-        from langchain.document_loaders import TextLoader
-
-        name = "the_Garden_of_sinners"
-        loader = TextLoader(f"{name}.txt", encoding="utf-8")
-        data = loader.load()
-        st.write(data)
 
         if "count" not in st.session_state:
             st.session_state.count = 0
