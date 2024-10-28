@@ -131,8 +131,8 @@ class MainR:
             st.session_state.chat_history = []
             st.session_state.vector_db = None
             st.session_state.vector_db = Chroma(
-                embedding=self.embed,
                 persist_directory=self.CHROMA_DB_PATH,
+                embedding_function=self.embed,
             )
         retriever = st.session_state.vector_db.as_retriever()
         st.session_state.history_aware_retriever = create_history_aware_retriever(
