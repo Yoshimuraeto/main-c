@@ -1,4 +1,4 @@
-from langchain.document_loaders import TextLoader, DirectoryLoader
+from langchain.document_loaders import TextLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
