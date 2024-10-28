@@ -202,13 +202,7 @@ class MainR:
         # データベースに登録
         now = datetime.datetime.now(pytz.timezone("Asia/Tokyo"))
         doc_ref = db.collection(str(st.session_state.user_id)).document(str(now))
-        doc_ref.set(
-            {
-                "user": user_input,
-                "asistant": assistant_response["answer"],
-                "context": assistant_response["context"],
-            }
-        )
+        doc_ref.set({"user": user_input, "asistant": assistant_response["answer"]})
         return assistant_response["answer"]
 
     def disable_chat_input(self):
