@@ -132,11 +132,9 @@ class MainR:
             self.chat_model, retriever, self.CONTEXTUALIZE_Q_PROMPT
         )
         qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
-        st.session_state.rag_chain = create_retrieval_chain(
+        rag_chain = create_retrieval_chain(
             st.session_state.history_aware_retriever, qa_chain
         )
-
-        """
         st.session_state.conversational_rag_chain = RunnableWithMessageHistory(
             rag_chain,
             self.get_session_history,
@@ -144,7 +142,6 @@ class MainR:
             history_messages_key="chat_history",
             output_messages_key="answer",
         )
-        """
 
     def display_chat_history(self):
         # チャットのメッセージの履歴作成と表示
@@ -177,8 +174,8 @@ class MainR:
             {"chat_history": st.session_state.chat_history, "input": user_input},
         )
         st.write(context)
-        assistant_response = st.session_state.rag_chain.invoke(
-            {"chat_history": st.session_state.chat_history, "input": user_input},
+        assistant_response = st.session_state.conversational_rag_chain.invoke(
+            {"input": user_input},
             config={"configurable": {"session_id": str(st.session_state.user_id)}},
         )
         # データベースに登録
@@ -248,12 +245,6 @@ class MainR:
                     )
 
                 # チャット履歴にメッセージを追加
-                st.session_state.chat_history.extend(
-                    [
-                        HumanMessage(content=user_input),
-                        AIMessage(content=assistant_response),
-                    ]
-                )
                 st.session_state.message_history.append(
                     {
                         "user_content": user_input,
