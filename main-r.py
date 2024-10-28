@@ -204,6 +204,13 @@ class MainR:
     def forward(self):
         st.title("MainR")
 
+        from langchain.document_loaders import TextLoader
+
+        name = "the_Garden_of_sinners"
+        loader = TextLoader(f"{name}.txt", encoding="utf-8")
+        data = loader.load()
+        st.write(data)
+
         if "count" not in st.session_state:
             st.session_state.count = 0
 
