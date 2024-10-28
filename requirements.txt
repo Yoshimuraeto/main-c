@@ -1,5 +1,5 @@
 firebase_admin
-chromadb==0.3.29
+chromadb==0.5.15
 tiktoken
 openai
 langchain
