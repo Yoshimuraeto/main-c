@@ -31,6 +31,7 @@ db = Chroma.from_documents(
 )
 if db:
     db.persist()
+    print(f"db:{db._collection.count()}")
     db = None
 else:
     print("Chroma DB has not been initialized.")

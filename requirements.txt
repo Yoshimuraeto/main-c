@@ -7,3 +7,4 @@ langchain_community
 langchain_openai
 streamlit
 streamlit_chat
+pysqlite3-binary
