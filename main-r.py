@@ -226,7 +226,7 @@ class MainR:
         from langchain.document_loaders import TextLoader
 
         name = "the_Garden_of_sinners"
-        loader = TextLoader(f"vector_database/{name}.txt", encoding="utf-8")
+        loader = TextLoader(f"{name}.txt", encoding="utf-8")
         data = loader.load()
         st.write(data)
 
