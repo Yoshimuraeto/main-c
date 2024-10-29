@@ -129,7 +129,6 @@ class MainR:
     def prepare_model_with_memory(self):
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
-            st.session_state.vector_db = []
         import os
 
         if os.path.exists(self.CHROMA_DB_PATH):
