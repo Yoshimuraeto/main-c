@@ -6,11 +6,11 @@ import streamlit as st
 
 st.title("Make Vector Database")
 
-name = "the_Garden_of_sinners"
+name = "liquid_neural_network"
 
 CHROMA_DB_PATH = f"vector_database/{name}"
 
-loader = TextLoader(f"{name}.txt", encoding="utf-8")
+loader = TextLoader(f"text/{name}.txt", encoding="utf-8")
 data = loader.load()
 
 text_splitter = CharacterTextSplitter(
@@ -18,7 +18,7 @@ text_splitter = CharacterTextSplitter(
 )
 documents = text_splitter.create_documents([doc.page_content for doc in data])
 
-with open("text_chunks.txt", "w", encoding="utf-8") as file:
+with open("text/text_chunks.txt", "w", encoding="utf-8") as file:
     for text in documents:
         file.write(text.page_content)
         file.write("\n--------------------------------------\n")
