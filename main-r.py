@@ -129,10 +129,10 @@ class MainR:
     def prepare_model_with_memory(self):
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
+            st.session_state.vector_db = []
         import os
 
         if os.path.exists(self.CHROMA_DB_PATH):
-            st.session_state.vector_db = []
             st.session_state.vector_db = Chroma(
                 persist_directory=self.CHROMA_DB_PATH,
                 embedding_function=self.embed,
