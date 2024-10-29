@@ -1,8 +1,3 @@
-import pysqlite3
-import sys
-
-sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
-
 import streamlit as st
 from streamlit_chat import message
 
@@ -50,7 +45,7 @@ class MainR:
             "just reformulate it if needed and otherwise return it as is."
         )
 
-        self.CHROMA_DB_PATH = ".\vector_database\the_Garden_of_sinners"
+        self.CHROMA_DB_PATH = "vector_database/the_Garden_of_sinners"
 
         self.embed = OpenAIEmbeddings(
             openai_api_key=st.secrets["OPENAI_API_KEY"],
@@ -132,7 +127,6 @@ class MainR:
         import os
 
         if os.path.exists(self.CHROMA_DB_PATH):
-            st.session_state.vector_db = []
             st.session_state.vector_db = Chroma(
                 persist_directory=self.CHROMA_DB_PATH,
                 embedding_function=self.embed,

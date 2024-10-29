@@ -4,6 +4,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Chroma
 import streamlit as st
 
+st.title("Make Vector Database")
 
 name = "the_Garden_of_sinners"
 
@@ -37,4 +38,4 @@ if db:
     print(f"db:{db._collection.count()}")
     db = None
 else:
-    print("Chroma DB has not been initialized.")
+    st.write("Chroma DB has not been initialized.")
