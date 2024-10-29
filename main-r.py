@@ -129,14 +129,10 @@ class MainR:
     def prepare_model_with_memory(self):
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
-        import os
-
-        if os.path.exists(self.CHROMA_DB_PATH):
-            st.session_state.vector_db = Chroma(
-                persist_directory=self.CHROMA_DB_PATH,
-                embedding_function=self.embed,
-            )
-            st.write(f"vector_db: {st.session_state.vector_db._collection.count()}")
+        st.session_state.vector_db = Chroma(
+            persist_directory=self.CHROMA_DB_PATH,
+            embedding_function=self.embed,
+        )
         retriever = st.session_state.vector_db.as_retriever()
         st.session_state.history_aware_retriever = create_history_aware_retriever(
             self.chat_model, retriever, self.CONTEXTUALIZE_Q_PROMPT
@@ -180,10 +176,10 @@ class MainR:
 
     def generate_and_store_response(self, user_input, db):
         # AIからの応答を取得
-        context = st.session_state.history_aware_retriever.invoke(
-            {"chat_history": st.session_state.chat_history, "input": user_input},
-        )
-        st.write(context)
+        # context = st.session_state.history_aware_retriever.invoke(
+        #    {"chat_history": st.session_state.chat_history, "input": user_input},
+        # )
+        # st.write(context)
         assistant_response = st.session_state.conversational_rag_chain.invoke(
             {"input": user_input},
             config={"configurable": {"session_id": str(st.session_state.user_id)}},
