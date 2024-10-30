@@ -195,7 +195,7 @@ class MainR:
         query_params = st.experimental_get_query_params()
         st.session_state.user_id = query_params.get("user_id", [None])[0]
         st.session_state.group_id = query_params.get("group", [None])[0]
-        st.session_state.theme = query_params.get("theme", [None])[0]
+        st.session_state.theme = query_params.get("talktheme", [None])[0]
 
     def forward(self):
         st.title("MainR")
