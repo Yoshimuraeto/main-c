@@ -38,8 +38,9 @@ vertify_user_id()
 
 if "user_id" in st.session_state:
     if st.session_state.user_id in addresed_accounts:
-        group_name = attendance_list[st.session_state.user_id][0]
-        theme = attendance_list[st.session_state.user_id][1]
+        attendance_attributes = attendance_list[st.session_state.user_id]
+        group_name = attendance_attributes[0]
+        theme = attendance_attributes[1]
         if group_name in group_urls:
             group_url = group_urls[group_name]
             group_url_with_id = f"{group_url}?user_id={st.session_state.user_id}&group={group_url}&talktheme={theme}"
