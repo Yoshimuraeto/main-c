@@ -4,7 +4,7 @@ import json
 
 group_urls = {
     "c": "https://main-c-hulfrzmcmnhcahoxdpc2gc.streamlit.app/",
-    "r": "https://main-c-hulfrzmcmnhcahoxdpc2gc.streamlit.app/",
+    "r": "https://main-c-ey8rrf82hhhzsur2wrhmx9.streamlit.app/",
 }
 
 # 特別なURLを定義します
