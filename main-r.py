@@ -50,8 +50,6 @@ class MainR:
             "just reformulate it if needed and otherwise return it as is."
         )
 
-        self.CHROMA_DB_PATH = "vector_database/liquid_neural_network"
-
         self.embed = OpenAIEmbeddings(
             openai_api_key=st.secrets["OPENAI_API_KEY"],
             model="text-embedding-3-large",
@@ -126,11 +124,12 @@ class MainR:
 
         return st.session_state.store[session_id]
 
-    def prepare_model_with_memory(self):
+    def prepare_model_with_memory(self, theme):
+        chroma_db_path = f"vector_database/{theme}"
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
         st.session_state.vector_db = Chroma(
-            persist_directory=self.CHROMA_DB_PATH,
+            persist_directory=chroma_db_path,
             embedding_function=self.embed,
         )
         retriever = st.session_state.vector_db.as_retriever()
@@ -176,10 +175,6 @@ class MainR:
 
     def generate_and_store_response(self, user_input, db):
         # AIからの応答を取得
-        # context = st.session_state.history_aware_retriever.invoke(
-        #    {"chat_history": st.session_state.chat_history, "input": user_input},
-        # )
-        # st.write(context)
         assistant_response = st.session_state.conversational_rag_chain.invoke(
             {"input": user_input},
             config={"configurable": {"session_id": str(st.session_state.user_id)}},
@@ -200,6 +195,7 @@ class MainR:
         query_params = st.experimental_get_query_params()
         st.session_state.user_id = query_params.get("user_id", [None])[0]
         st.session_state.group_id = query_params.get("group", [None])[0]
+        st.session_state.theme = query_params.get("theme", [None])[0]
 
     def forward(self):
         st.title("MainR")
@@ -219,7 +215,7 @@ class MainR:
         st.session_state.chat_placeholder = st.empty()
         self.display_chat_history()
 
-        self.prepare_model_with_memory()
+        self.prepare_model_with_memory(st.session_state.theme)
 
         if st.session_state.count >= 5:
             group_url = (

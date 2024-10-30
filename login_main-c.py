@@ -1,13 +1,10 @@
 import streamlit as st
 import json
 
-# TODO: 飛べるURLにする
+
 group_urls = {
-    "a": "https://main-c-hulfrzmcmnhcahoxdpc2gc.streamlit.app/",
-    "b": "https://main-c-hulfrzmcmnhcahoxdpc2gc.streamlit.app/",
     "c": "https://main-c-hulfrzmcmnhcahoxdpc2gc.streamlit.app/",
-    "d": "https://main-c-hulfrzmcmnhcahoxdpc2gc.streamlit.app/",
-    "e": "https://main-c-hulfrzmcmnhcahoxdpc2gc.streamlit.app/",
+    "r": "https://main-c-hulfrzmcmnhcahoxdpc2gc.streamlit.app/",
 }
 
 # 特別なURLを定義します
@@ -41,12 +38,11 @@ vertify_user_id()
 
 if "user_id" in st.session_state:
     if st.session_state.user_id in addresed_accounts:
-        group_name = attendance_list[st.session_state.user_id]
+        group_name = attendance_list[st.session_state.user_id][0]
+        theme = attendance_list[st.session_state.user_id][1]
         if group_name in group_urls:
             group_url = group_urls[group_name]
-            group_url_with_id = (
-                f"{group_url}?user_id={st.session_state.user_id}&group={group_url}"
-            )
+            group_url_with_id = f"{group_url}?user_id={st.session_state.user_id}&group={group_url}&theme={theme}"
             st.success(f"ようこそ、{st.session_state.user_id} さん！")
             st.markdown(
                 f"こちらのリンクをクリックして、今日の会話を開始してください。: <a href='{group_url_with_id}' target='_blank'>リンク</a>",
