@@ -41,9 +41,6 @@ if "user_id" in st.session_state:
         attendance_attributes = attendance_list[st.session_state.user_id]
         group_name = attendance_attributes[0]
         theme = attendance_attributes[1]
-        st.write(attendance_attributes)
-        st.write(group_name)
-        st.write(theme)
         if group_name in group_urls:
             group_url = group_urls[group_name]
             group_url_with_id = f"{group_url}?user_id={st.session_state.user_id}&group={group_url}&talktheme={theme}"
