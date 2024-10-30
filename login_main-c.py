@@ -42,7 +42,7 @@ if "user_id" in st.session_state:
         theme = attendance_list[st.session_state.user_id][1]
         if group_name in group_urls:
             group_url = group_urls[group_name]
-            group_url_with_id = f"{group_url}?user_id={st.session_state.user_id}&group={group_url}&theme={theme}"
+            group_url_with_id = f"{group_url}?user_id={st.session_state.user_id}&group={group_url}&talktheme={theme}"
             st.success(f"ようこそ、{st.session_state.user_id} さん！")
             st.markdown(
                 f"こちらのリンクをクリックして、今日の会話を開始してください。: <a href='{group_url_with_id}' target='_blank'>リンク</a>",
