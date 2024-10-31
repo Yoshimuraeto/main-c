@@ -111,6 +111,7 @@ class MainR:
 
         except:
             self.disable_chat_input()
+            st.error("Firebaseの認証に失敗しました")
             return None
 
     def get_session_history(self, session_id: str) -> BaseChatMessageHistory:
