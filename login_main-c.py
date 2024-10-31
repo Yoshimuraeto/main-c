@@ -49,7 +49,7 @@ class Authenticator:
                     )
 
     def forward(self):
-        st.title("Login MainC")
+        st.title("Authentication")
         addresed_accounts, attendance_list = self.get_attendance_attributes()
         self.vertify_user_id(addresed_accounts)
         self.make_user_url(addresed_accounts, attendance_list, self.GROUP_URLS)
