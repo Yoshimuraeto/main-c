@@ -19,8 +19,6 @@ from langchain.prompts.chat import (
     MessagesPlaceholder,
 )
 
-from langchain_core.messages import AIMessage, HumanMessage
-
 from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_community.chat_message_histories import ChatMessageHistory
@@ -42,17 +40,18 @@ class MainR:
             streaming=True,
             max_tokens=1024,
         )
+
+        self.embed = OpenAIEmbeddings(
+            openai_api_key=st.secrets["OPENAI_API_KEY"],
+            model="text-embedding-3-large",
+        )
+
         self.CONTEXTUALIZE_Q_SYSTEM_PROMPT = (
             "Given a chat history and the latest user question "
             "which might reference context in the chat history, "
             "formulate a standalone question which can be understood "
             "without the chat history. Do NOT answer the question, "
             "just reformulate it if needed and otherwise return it as is."
-        )
-
-        self.embed = OpenAIEmbeddings(
-            openai_api_key=st.secrets["OPENAI_API_KEY"],
-            model="text-embedding-3-large",
         )
 
         self.CONTEXTUALIZE_Q_PROMPT = ChatPromptTemplate.from_messages(
@@ -125,29 +124,35 @@ class MainR:
         return st.session_state.store[session_id]
 
     def prepare_model_with_memory(self, theme):
-        chroma_db_path = f"vector_database/{theme}"
+
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
-        st.session_state.vector_db = Chroma(
-            persist_directory=chroma_db_path,
-            embedding_function=self.embed,
-        )
-        st.write(f"vector_db: {st.session_state.vector_db._collection.count()}")
-        retriever = st.session_state.vector_db.as_retriever()
-        st.session_state.history_aware_retriever = create_history_aware_retriever(
-            self.chat_model, retriever, self.CONTEXTUALIZE_Q_PROMPT
-        )
-        qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
-        rag_chain = create_retrieval_chain(
-            st.session_state.history_aware_retriever, qa_chain
-        )
-        st.session_state.conversational_rag_chain = RunnableWithMessageHistory(
-            rag_chain,
-            self.get_session_history,
-            input_messages_key="input",
-            history_messages_key="chat_history",
-            output_messages_key="answer",
-        )
+        if "vector_db" not in st.session_state:
+            chroma_db_path = f"vector_database/{theme}"
+            st.session_state.vector_db = Chroma(
+                persist_directory=chroma_db_path,
+                embedding_function=self.embed,
+            )
+        vdb_count = st.session_state.vector_db._collection.count()
+        vdb_count = 0
+        if vdb_count <= 0:
+            self.disable_chat_input()
+        else:
+            retriever = st.session_state.vector_db.as_retriever()
+            st.session_state.history_aware_retriever = create_history_aware_retriever(
+                self.chat_model, retriever, self.CONTEXTUALIZE_Q_PROMPT
+            )
+            qa_chain = create_stuff_documents_chain(self.chat_model, self.PROMPT)
+            rag_chain = create_retrieval_chain(
+                st.session_state.history_aware_retriever, qa_chain
+            )
+            st.session_state.conversational_rag_chain = RunnableWithMessageHistory(
+                rag_chain,
+                self.get_session_history,
+                input_messages_key="input",
+                history_messages_key="chat_history",
+                output_messages_key="answer",
+            )
 
     def display_chat_history(self):
         # チャットのメッセージの履歴作成と表示
