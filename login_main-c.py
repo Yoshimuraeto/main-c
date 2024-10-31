@@ -41,7 +41,7 @@ class Authenticator:
                 theme = attendance_attributes[1]
                 if group_name in group_urls:
                     group_url = group_urls[group_name]
-                    group_url_with_id = f"{group_url}?user_id={st.session_state.user_id}&group={group_url}&talktheme={theme}"
+                    group_url_with_id = f"{group_url}?user_id={st.session_state.user_id}&group={group_name}&talktheme={theme}"
                     st.success(f"ようこそ、{st.session_state.user_id} さん！")
                     st.markdown(
                         f"こちらのリンクをクリックして、今日の会話を開始してください。: <a href='{group_url_with_id}' target='_blank'>リンク</a>",
