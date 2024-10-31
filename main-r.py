@@ -133,9 +133,7 @@ class MainR:
                 persist_directory=chroma_db_path,
                 embedding_function=self.embed,
             )
-        vdb_count = st.session_state.vector_db._collection.count()
-        vdb_count = 0
-        if vdb_count <= 0:
+        if st.session_state.vector_db._collection.count() <= 0:
             self.disable_chat_input()
             st.error("ベクトルデータベースの読み込みに失敗しました")
         else:
