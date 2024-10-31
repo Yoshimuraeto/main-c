@@ -219,10 +219,10 @@ class MainR:
         if st.session_state.db is None:
             st.error("Firebaseの認証に失敗しました")
 
+        self.prepare_model_with_memory(st.session_state.theme)
+
         st.session_state.chat_placeholder = st.empty()
         self.display_chat_history()
-
-        self.prepare_model_with_memory(st.session_state.theme)
 
         if st.session_state.count >= 5:
             group_url = (
