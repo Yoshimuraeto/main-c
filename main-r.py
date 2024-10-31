@@ -137,6 +137,7 @@ class MainR:
         vdb_count = 0
         if vdb_count <= 0:
             self.disable_chat_input()
+            st.error("ベクトルデータベースの読み込みに失敗しました")
         else:
             retriever = st.session_state.vector_db.as_retriever()
             st.session_state.history_aware_retriever = create_history_aware_retriever(
@@ -216,7 +217,7 @@ class MainR:
             st.session_state.initge = ["はじめまして!!"]
 
         if st.session_state.db is None:
-            st.write("Firebaseの認証に失敗しました")
+            st.error("Firebaseの認証に失敗しました")
 
         st.session_state.chat_placeholder = st.empty()
         self.display_chat_history()
