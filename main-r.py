@@ -14,6 +14,7 @@ import datetime
 import pytz
 
 from langchain.chat_models import ChatOpenAI
+from langchain_openai import OpenAIEmbeddings
 from langchain.prompts.chat import (
     ChatPromptTemplate,
     MessagesPlaceholder,
@@ -23,12 +24,10 @@ from langchain_core.runnables.history import RunnableWithMessageHistory
 from langchain_core.chat_history import BaseChatMessageHistory
 from langchain_community.chat_message_histories import ChatMessageHistory
 
+from langchain_chroma import Chroma
 from langchain.chains import create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_history_aware_retriever
-
-from langchain_chroma import Chroma
-from langchain_openai import OpenAIEmbeddings
 
 
 class MainR:
@@ -75,6 +74,22 @@ class MainR:
             ]
         )
 
+    def get_session_history(self, session_id: str) -> BaseChatMessageHistory:
+        # セッションIDごとの会話履歴の取得
+        if "store" not in st.session_state:
+            st.session_state.store = {}
+
+        if session_id not in st.session_state.store:
+            st.session_state.store[session_id] = ChatMessageHistory()
+
+        return st.session_state.store[session_id]
+
+    def get_ids(self):
+        query_params = st.experimental_get_query_params()
+        st.session_state.user_id = query_params.get("user_id", [None])[0]
+        st.session_state.group_id = query_params.get("group", [None])[0]
+        st.session_state.theme = query_params.get("talktheme", [None])[0]
+
     def prepare_firestore(self):
         try:
             if not firebase_admin._apps:
@@ -89,6 +104,7 @@ class MainR:
                 auth_provider_x509_cert_url = st.secrets["auth_provider_x509_cert_url"]
                 client_x509_cert_url = st.secrets["client_x509_cert_url"]
                 universe_domain = st.secrets["universe_domain"]
+
                 # Firebase認証情報を設定
                 cred = credentials.Certificate(
                     {
@@ -114,26 +130,18 @@ class MainR:
             st.error("Firebaseの認証に失敗しました")
             return None
 
-    def get_session_history(self, session_id: str) -> BaseChatMessageHistory:
-        # セッションIDごとの会話履歴の取得
-        if "store" not in st.session_state:
-            st.session_state.store = {}
-
-        if session_id not in st.session_state.store:
-            st.session_state.store[session_id] = ChatMessageHistory()
-
-        return st.session_state.store[session_id]
-
     def prepare_model_with_memory(self, theme):
 
         if "chat_history" not in st.session_state:
             st.session_state.chat_history = []
+
         if "vector_db" not in st.session_state:
             chroma_db_path = f"vector_database/{theme}"
             st.session_state.vector_db = Chroma(
                 persist_directory=chroma_db_path,
                 embedding_function=self.embed,
             )
+
         if st.session_state.vector_db._collection.count() <= 0:
             self.disable_chat_input()
             st.error("ベクトルデータベースの読み込みに失敗しました")
@@ -155,6 +163,7 @@ class MainR:
             )
 
     def display_chat_history(self):
+        st.session_state.chat_placeholder = st.empty()
         # チャットのメッセージの履歴作成と表示
         if "message_history" not in st.session_state:
             st.session_state.message_history = []
@@ -197,12 +206,6 @@ class MainR:
     def enable_chat_input(self):
         st.session_state["chat_input_disabled"] = False
 
-    def get_ids(self):
-        query_params = st.experimental_get_query_params()
-        st.session_state.user_id = query_params.get("user_id", [None])[0]
-        st.session_state.group_id = query_params.get("group", [None])[0]
-        st.session_state.theme = query_params.get("talktheme", [None])[0]
-
     def forward(self):
         st.title("MainR")
 
@@ -220,7 +223,6 @@ class MainR:
 
         self.prepare_model_with_memory(st.session_state.theme)
 
-        st.session_state.chat_placeholder = st.empty()
         self.display_chat_history()
 
         if st.session_state.count >= 5:
