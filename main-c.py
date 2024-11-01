@@ -39,6 +39,22 @@ class MainC:
             ]
         )
 
+    def get_session_history(self, session_id: str) -> BaseChatMessageHistory:
+        # セッションIDごとの会話履歴の取得
+        if "store" not in st.session_state:
+            st.session_state.store = {}
+
+        if session_id not in st.session_state.store:
+            st.session_state.store[session_id] = ChatMessageHistory()
+
+        return st.session_state.store[session_id]
+
+    def get_ids(self):
+        query_params = st.experimental_get_query_params()
+        st.session_state.user_id = query_params.get("user_id", [None])[0]
+        st.session_state.group_id = query_params.get("group", [None])[0]
+        st.session_state.theme = query_params.get("talktheme", [None])[0]
+
     def prepare_firestore(self):
         try:
             if not firebase_admin._apps:
@@ -77,16 +93,6 @@ class MainC:
             self.disable_chat_input()
             st.error("Firebaseの認証に失敗しました")
             return None
-
-    def get_session_history(self, session_id: str) -> BaseChatMessageHistory:
-        # セッションIDごとの会話履歴の取得
-        if "store" not in st.session_state:
-            st.session_state.store = {}
-
-        if session_id not in st.session_state.store:
-            st.session_state.store[session_id] = ChatMessageHistory()
-
-        return st.session_state.store[session_id]
 
     def prepare_memory(self, chat_model, prompt):
         if not hasattr(st.session_state, "runnable_with_history"):
@@ -145,12 +151,6 @@ class MainC:
 
     def enable_chat_input(self):
         st.session_state["chat_input_disabled"] = False
-
-    def get_ids(self):
-        query_params = st.experimental_get_query_params()
-        st.session_state.user_id = query_params.get("user_id", [None])[0]
-        st.session_state.group_id = query_params.get("group", [None])[0]
-        st.session_state.theme = query_params.get("talktheme", [None])[0]
 
     def forward(self):
         st.title("MainC")
