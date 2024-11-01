@@ -1,4 +1,6 @@
 .streamlit/
 venv/
+csv/
+text/
 main-c_textbook.py
 experiments.py
