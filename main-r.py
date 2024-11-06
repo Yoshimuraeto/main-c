@@ -170,8 +170,8 @@ class MainR:
         with st.session_state.chat_placeholder.container():
             message(
                 st.session_state.initge[0],
-                key="img/AI_picture.png",
-                avatar_style="micah",
+                key="init_greeting_plus",
+                avatar_style="img/AI_picture.png",
             )
             for i in range(len(st.session_state.message_history)):
                 message(
