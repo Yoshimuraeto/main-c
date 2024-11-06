@@ -171,21 +171,21 @@ class MainR:
             message(
                 st.session_state.initge[0],
                 key="init_greeting_plus",
-                avatar_style="https://raw.githubusercontent.com/Yoshimuraeto/main-c/refs/heads/main/img/AI_picture.png",
+                logo="https://raw.githubusercontent.com/Yoshimuraeto/main-c/refs/heads/main/img/AI_picture.png",
             )
             for i in range(len(st.session_state.message_history)):
                 message(
                     st.session_state.message_history[i]["user_content"],
                     is_user=True,
                     key=str(i),
-                    avatar_style="https://raw.githubusercontent.com/Yoshimuraeto/main-c/refs/heads/main/img/user_picture.png",
+                    logo="https://raw.githubusercontent.com/Yoshimuraeto/main-c/refs/heads/main/img/user_picture.png",
                     seed="Nala",
                 )
                 key_generated = str(i) + "keyg"
                 message(
                     st.session_state.message_history[i]["assistant_content"],
                     key=str(key_generated),
-                    avatar_style="https://raw.githubusercontent.com/Yoshimuraeto/main-c/refs/heads/main/img/AI_picture.png",
+                    logo="https://raw.githubusercontent.com/Yoshimuraeto/main-c/refs/heads/main/img/AI_picture.png",
                 )
 
     def generate_and_store_response(self, user_input, db):
