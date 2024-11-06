@@ -6,7 +6,7 @@ import streamlit as st
 
 st.title("Make Vector Database")
 
-name = "diary"
+name = "virtual_diary"
 
 CHROMA_DB_PATH = f"vector_database/{name}"
 
