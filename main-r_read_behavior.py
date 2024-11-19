@@ -230,9 +230,17 @@ class MainR:
             assistant_response = self.generate_and_store_response(
                 system_input, st.session_state.db
             )
+            st.markdown(
+                f"{assistant_response}",
+                unsafe_allow_html=True,
+            )
             system_input = "今までの対話からわかるこの人の行動の特徴は何か？"
             assistant_response = self.generate_and_store_response(
                 system_input, st.session_state.db
+            )
+            st.markdown(
+                f"{assistant_response}",
+                unsafe_allow_html=True,
             )
             with open("text/questions.txt", "r", encoding="utf-8") as f:
                 questions = f.read()
