@@ -7,6 +7,7 @@ class Authenticator:
         self.GROUP_URLS = {
             "c": "https://main-c-hulfrzmcmnhcahoxdpc2gc.streamlit.app/",
             "r": "https://main-c-ey8rrf82hhhzsur2wrhmx9.streamlit.app/",
+            "b": "https://main-c-chatbot-gf6b8fhdhdenreey45xtri.streamlit.app/",
         }
         # 特別なURLを定義
         self.SPECIAL_URL = "https://www.google.com"
