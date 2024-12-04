@@ -244,7 +244,8 @@ class MainR:
             )
             with open("text/questions.txt", "r", encoding="utf-8") as f:
                 questions = f.read()
-            system_input = f"以下の質問に回答のみを対話した人になりきり数字で答えて下さい。ただしその際にこの人の行動の特徴を考慮してください。{questions}"
+            system_input = f"以下の質問に回答のみを対話した人になりきり数字で答えて下さい。ただしその際にこの人の行動の特徴を考慮してください。{questions}.
+            回答は以下のフォーマットにしてください。「1,2,3,4,5,…」"
             assistant_response = self.generate_and_store_response(
                 system_input, st.session_state.db
             )
